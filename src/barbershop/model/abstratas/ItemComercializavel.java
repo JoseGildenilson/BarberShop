@@ -9,7 +9,7 @@ public abstract class ItemComercializavel{
         this.valorBase = valorBase;
     }
 
-    public abstract double calcularPrecoFinal();
+    public abstract double getPreco();
 
     public String gerNome(){
         return nome;
