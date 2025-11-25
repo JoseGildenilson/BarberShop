@@ -13,7 +13,17 @@ public class Produto extends ItemComercializavel{
         this.marca = marca;
     }
 
+    //Getters
     public double getPreco(){
         return valorBase;
-    } 
+    }
+
+    public int getQtdEstoque(){
+        return qtdEstoque;
+    }
+
+    public String getMarca(){
+        return marca;
+    }
+
 }
