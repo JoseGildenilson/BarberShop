@@ -27,4 +27,10 @@ public class Servico extends ItemComercializavel implements Agendavel{
     public double getPreco(){
         return valorBase;
     }
+
+
+    //Método da classe
+    public int getTempoEstimado(){
+        return tempoEstimado;
+    } 
 }
