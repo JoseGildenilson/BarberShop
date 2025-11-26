@@ -16,4 +16,13 @@ public class Barbeiro extends Pessoa{
     public void exibirDados(){
         System.out.println("Nome: " + getNome() + "/CPF: " + getCpf() + "/Telefone: " + getTelefone() + "/Especialidade: " + especialidade + "/ Comissão: " + comissao);
     }
+
+    // getters
+    public String getEspecialidade(){
+        return especialidade;
+    }
+
+    public double getComissao(){
+        return comissao;
+    }
 }   

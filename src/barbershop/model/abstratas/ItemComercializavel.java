@@ -11,10 +11,10 @@ public abstract class ItemComercializavel{
 
     public abstract double getPreco();
 
-    public String gerNome(){
+    public String getNome(){
         return nome;
     }
-    public double gerValorBase(){
+    public double getValorBase(){
         return valorBase;
     }
 }
