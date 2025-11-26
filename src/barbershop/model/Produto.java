@@ -26,4 +26,9 @@ public class Produto extends ItemComercializavel{
         return marca;
     }
 
+
+    //Setters
+    public void setQtdEstoque(int qtdEstoque) {
+        this.qtdEstoque = qtdEstoque;
+    }
 }

@@ -7,8 +7,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class GerenciadorArquivos{
+public class GerenciadorArquivos {
     private static final String DIRETORIO_DADOS = "dados";
 
     private static final String ARQUIVO_PRODUTOS = DIRETORIO_DADOS + File.separator + "produtos.csv";
@@ -30,7 +29,7 @@ public class GerenciadorArquivos{
         } 
     }
 
-    // Métodos para Produtos
+    // --- Métodos para Produtos ---
     public void salvarProdutos(Produto produto){
         String linha = String.format("%s;%.2f;%d;%s",produto.getNome(), produto.getValorBase(), produto.getQtdEstoque(), produto.getMarca());
         escreverNoArquivo(ARQUIVO_PRODUTOS, linha);
@@ -58,8 +57,7 @@ public class GerenciadorArquivos{
         return produtos;
     }
 
-
-    //Métodos para Serviços
+    // --- Métodos para Serviços ---
     public void salvarServico(Servico servico) {
         String linha = String.format("%s;%.2f;%d", servico.getNome(), servico.getValorBase(), servico.getTempoEstimado());
         escreverNoArquivo(ARQUIVO_SERVICOS, linha);
@@ -86,7 +84,7 @@ public class GerenciadorArquivos{
         return servicos;
     }
 
-    //Métodos para cliente
+    // --- Métodos para Clientes ---
     public void salvarCliente(Cliente cliente){
         String linha = String.format("%s;%s;%s;%d", cliente.getNome(), cliente.getCpf(), cliente.getTelefone(), cliente.getPontosFidelidade());
         escreverNoArquivo(ARQUIVO_CLIENTES, linha);
@@ -118,8 +116,7 @@ public class GerenciadorArquivos{
         return clientes;
     }
 
-
-    //Métodos para barbeiro
+    // --- Métodos para Barbeiros ---
     public void salvarBarbeiro(Barbeiro barbeiro){
         String linha = String.format("%s;%s;%s;%s;%.2f", barbeiro.getNome(), barbeiro.getCpf(), barbeiro.getTelefone(), barbeiro.getEspecialidade(), barbeiro.getComissao());
         escreverNoArquivo(ARQUIVO_BARBEIROS, linha);
@@ -149,7 +146,8 @@ public class GerenciadorArquivos{
         }
         return barbeiros;
     }
-    //Métodos para Insumos
+
+    // --- Métodos para Insumos ---
     public void salvarInsumo(Insumo insumo){
         String linha = String.format("%s;%d;%.2f", insumo.getNome(), insumo.getQtdEstoque(), insumo.getCustoUnitario());
         escreverNoArquivo(ARQUIVO_INSUMOS, linha);
@@ -176,7 +174,7 @@ public class GerenciadorArquivos{
          return insumos;
     }
 
-    //Métodos para promoções
+    // --- Métodos para Promoções ---
     public void salvarPromocao(Promocao promocao){
         String linha = String.format("%s;%.2f;%s;%s", promocao.getNome(), promocao.getDescontoPercentual(), promocao.getDataInicio().toString(), promocao.getDataFim().toString());
         escreverNoArquivo(ARQUIVO_PROMOCOES, linha);
@@ -204,7 +202,7 @@ public class GerenciadorArquivos{
         return promocoes;
     }
 
-    // Métodos para agendamentos
+    // --- Métodos para Agendamentos ---
     public void salvarAgendamento(Agendamento agendamento) {
         String linha = String.format("%s;%s;%s;%s;%s", agendamento.getCliente().getCpf(), agendamento.getBarbeiro().getCpf(), agendamento.getServico().getNome(), agendamento.getDataHora().toString(), agendamento.getStatus().name());
         escreverNoArquivo(ARQUIVO_AGENDAMENTOS, linha);
@@ -230,7 +228,7 @@ public class GerenciadorArquivos{
 
                     if (clienteEncontrado != null && barbeiroEncontrado != null && servicoEncontrado != null) {
                         Agendamento agendamento = new Agendamento(clienteEncontrado, barbeiroEncontrado, servicoEncontrado, dataHora);
-                        agendamento.setStatus(status); // Restaura o status (ex: se já foi pago/concluido)
+                        agendamento.setStatus(status); 
                         agendamentos.add(agendamento);
                     }
                 }
@@ -241,7 +239,7 @@ public class GerenciadorArquivos{
         return agendamentos;
     }
 
-    // Métodos auxiliares para busca
+    // --- Métodos Auxiliares de Busca ---
     private Cliente buscarClientePorCpf(List<Cliente> clientes, String cpf) {
         for (Cliente c : clientes) {
             if (c.getCpf().equals(cpf)) return c;
@@ -263,7 +261,7 @@ public class GerenciadorArquivos{
         return null;
     }
 
-    //Métodos auxiliares da classe
+    // --- Métodos de Leitura e Escrita Básica ---
     private void escreverNoArquivo(String caminho, String linha) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminho, true))) {
             writer.write(linha);
@@ -293,5 +291,53 @@ public class GerenciadorArquivos{
             System.err.println("Erro ao ler dados de: " + caminho);
         }
         return linhas;
+    }
+
+    // --- MÉTODOS DE ATUALIZAÇÃO (REESCREVER ARQUIVOS COMPLETOS) ---
+
+    // Sobrescreve (update) produtos (ex: estoque)
+    public void reescreverProdutos(List<Produto> produtos) {
+        List<String> linhas = new ArrayList<>();
+        for (Produto p : produtos) {
+            String linha = String.format("%s;%.2f;%d;%s",
+                    p.getNome(), p.getValorBase(), p.getQtdEstoque(), p.getMarca());
+            linhas.add(linha);
+        }
+        sobrescreverArquivo(ARQUIVO_PRODUTOS, linhas);
+    }
+
+    // Sobrescreve (update) clientes (ex: pontos ou dados pessoais)
+    public void reescreverClientes(List<Cliente> clientes) {
+        List<String> linhas = new ArrayList<>();
+        for (Cliente c : clientes) {
+            String linha = String.format("%s;%s;%s;%d",
+                    c.getNome(), c.getCpf(), c.getTelefone(), c.getPontosFidelidade());
+            linhas.add(linha);
+        }
+        sobrescreverArquivo(ARQUIVO_CLIENTES, linhas);
+    }
+
+    // Sobrescreve (update) barbeiros (ex: exclusão)
+    public void reescreverBarbeiros(List<Barbeiro> barbeiros) {
+        List<String> linhas = new ArrayList<>();
+        for (Barbeiro b : barbeiros) {
+            String linha = String.format("%s;%s;%s;%s;%.2f",
+                    b.getNome(), b.getCpf(), b.getTelefone(), b.getEspecialidade(), b.getComissao());
+            linhas.add(linha);
+        }
+        sobrescreverArquivo(ARQUIVO_BARBEIROS, linhas);
+    }
+
+    // Método genérico para sobrescrever (append=false)
+    private void sobrescreverArquivo(String caminho, List<String> linhas) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminho, false))) { 
+            for (String linha : linhas) {
+                writer.write(linha);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao atualizar arquivo: " + caminho);
+            e.printStackTrace();
+        }
     }
 }

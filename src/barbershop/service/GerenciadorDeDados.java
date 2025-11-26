@@ -26,10 +26,10 @@ public class GerenciadorDeDados {
         this.promocoes = new ArrayList<>();
         this.agendamentos = new ArrayList<>();
 
-        carregarDadosInicias();
+        carregarDadosIniciais();
     }
 
-    private void carregarDadosInicias() {
+    private void carregarDadosIniciais() {
         System.out.println("Carregando dados do sistema...");
         
         this.clientes = gerenciadorArquivos.carregarClientes();
@@ -79,6 +79,7 @@ public class GerenciadorDeDados {
         gerenciadorArquivos.salvarAgendamento(agendamento);
     }
 
+    // --- GETTERS ---
     public List<Cliente> getClientes() {
         return clientes;
     }
@@ -107,7 +108,7 @@ public class GerenciadorDeDados {
         return agendamentos;
     }
 
-    // Método Para buscar cliente pelo CPF
+    // --- BUSCA ---
     public Cliente buscarClientePorCpf(String cpf) {
         for (Cliente c : clientes) {
             if (c.getCpf().equals(cpf)) {
@@ -115,5 +116,54 @@ public class GerenciadorDeDados {
             }
         }
         return null;
+    }
+
+    // --- MÉTODOS PARA SALVAR ALTERAÇÕES GERAIS (UPDATE) ---
+
+    public void atualizarEstoqueProdutos() {
+        gerenciadorArquivos.reescreverProdutos(this.produtos);
+    }
+
+    public void atualizarPontosClientes() {
+        gerenciadorArquivos.reescreverClientes(this.clientes);
+    }
+
+    // --- MÉTODOS DE REMOÇÃO E EDIÇÃO ---
+
+    public boolean removerCliente(String cpf) {
+        Cliente clienteParaRemover = buscarClientePorCpf(cpf);
+        if (clienteParaRemover != null) {
+            clientes.remove(clienteParaRemover); // Remove da RAM
+            gerenciadorArquivos.reescreverClientes(this.clientes); // Atualiza o arquivo
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removerBarbeiro(String cpf) {
+        Barbeiro barbeiroParaRemover = null;
+        for (Barbeiro b : barbeiros) {
+            if (b.getCpf().equals(cpf)) {
+                barbeiroParaRemover = b;
+                break;
+            }
+        }
+        
+        if (barbeiroParaRemover != null) {
+            barbeiros.remove(barbeiroParaRemover);
+            gerenciadorArquivos.reescreverBarbeiros(this.barbeiros);
+            return true;
+        }
+        return false;
+    }
+    
+    // Método para salvar qualquer alteração feita nos objetos de cliente (ex: edição de telefone)
+    public void salvarAlteracoesClientes() {
+        gerenciadorArquivos.reescreverClientes(this.clientes);
+    }
+
+    // Método para salvar alterações nos objetos de barbeiro
+    public void salvarAlteracoesBarbeiros() {
+        gerenciadorArquivos.reescreverBarbeiros(this.barbeiros);
     }
 }
