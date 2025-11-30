@@ -1,5 +1,7 @@
 package barbershop.service;
 
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 import barbershop.model.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,11 +110,78 @@ public class GerenciadorDeDados {
         return agendamentos;
     }
 
-    // --- BUSCA ---
+    // ? --- BUSCA ---
+
+    // ! Verificar se o CPF cliente existe no arquivo 
     public Cliente buscarClientePorCpf(String cpf) {
         for (Cliente c : clientes) {
             if (c.getCpf().equals(cpf)) {
                 return c;
+            }
+        }
+        return null;
+    }
+
+    // ! Verificar se o CPF do barbeiro existe no arquivo 
+    public Barbeiro buscarBarbeiroPorCpf(String cpf) {
+        for (Barbeiro b : barbeiros) {
+            if (b.getCpf().equals(cpf)) {
+                return b;
+            }
+        }
+        return null;
+    }
+ 
+    // ! Vericiar se o nome do serviço existe no arquivo 
+    public Servico buscarServicoPorNome(String nome) {
+        String nomeBusca = normalizaTexto(nome);
+        
+        for (Servico s : servicos) {
+            String nomeExistente = s.getNome().toLowerCase().replace(" ", "");
+            
+            if (nomeExistente.equals(nomeBusca)) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    // ! Verificar se o nome e marca do produto existe no arquivo
+    public Produto buscaProdutoPorNomeEMarca(String nome, String marca) {
+        String nomeBusca = normalizaTexto(nome);
+        String marcaBusca = normalizaTexto(marca);
+
+        for(Produto p : produtos){
+            String nomeExistente = normalizaTexto(p.getNome());
+            String marcaExistente = normalizaTexto(p.getMarca());
+            
+            if(nomeExistente.equals(nomeBusca) && marcaExistente.equals(marcaBusca)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    // ! verifica se o insumo existe no arquivo
+    public Insumo buscarInsumoPorNome(String nome) {
+        String nomeBusca = normalizaTexto(nome);
+
+        for(Insumo i : insumos) {
+            if(normalizaTexto(i.getNome()).equals(nomeBusca));
+            return i;
+        }
+        return null;
+    }
+
+    // ! verifica se o produto existe no arquivo
+
+
+    public Promocao buscarPromocaoPorNome(String nome) {
+        String nomeBusca = normalizaTexto(nome);
+        
+        for (Promocao p : promocoes) {
+            if (normalizaTexto(p.getNome()).equals(nomeBusca)) {
+                return p;
             }
         }
         return null;
@@ -165,5 +234,20 @@ public class GerenciadorDeDados {
     // Método para salvar alterações nos objetos de barbeiro
     public void salvarAlteracoesBarbeiros() {
         gerenciadorArquivos.reescreverBarbeiros(this.barbeiros);
+    }
+
+    // ? Métodos auxiliares
+
+    // ! Normalizar texto retirando espaços, acentos e letras maiúsculas para comparação no arquivo
+    private String normalizaTexto(String texto) {
+        if(texto == null) {
+            return "";
+        }
+        String nfdNormalizedString = Normalizer.normalize(texto, Normalizer.Form.NFD);
+
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        String semAcento = pattern.matcher(nfdNormalizedString).replaceAll("");
+
+        return semAcento.toLowerCase().replace(" ", "");
     }
 }

@@ -1,5 +1,6 @@
 package barbershop;
 
+import barbershop.exception.*;
 import barbershop.model.*; 
 import barbershop.service.GerenciadorDeDados;
 import java.util.Scanner;
@@ -14,7 +15,8 @@ public class Main {
 
         String nome = prefs.getNomeUsuario();
         String tema = prefs.getTema();
-        
+
+        limparTela();
         System.out.println("=== BEM-VINDO AO BARBERSHOP MANAGER ===");
         System.out.println("Olá, " + nome + "! (Tema atual: " + tema + ")");
         System.out.println("=======================================");
@@ -73,6 +75,7 @@ public class Main {
     private static void menuCadastros() {
         int opcao = -1;
         while (opcao != 0) {
+            limparTela();
             System.out.println("\n--- MENU DE CADASTROS ---");
             System.out.println("1. Cadastrar Cliente");
             System.out.println("2. Cadastrar Barbeiro");
@@ -106,6 +109,7 @@ public class Main {
     private static void menuAgendamentos() {
         int opcao = -1;
         while (opcao != 0) {
+            limparTela();
             System.out.println("\n--- MENU DE AGENDAMENTOS ---");
             System.out.println("1. Novo Agendamento");
             System.out.println("2. Listar Agendamentos");
@@ -208,30 +212,77 @@ public class Main {
         }
     }
 
-    // --- Métodos de Cadastro ---
+    // ? --- Métodos de Cadastro ---
 
+
+    // ! Função para cadastrar um novo cliente
     private static void cadastrarCliente() {
         System.out.println("\n--- NOVO CLIENTE ---");
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
-        System.out.print("CPF: ");
-        String cpf = scanner.nextLine();
-        System.out.print("Telefone: ");
-        String telefone = scanner.nextLine();
+
+        // recebendo e verificando se o CPF está correto(todos os digitos) e se já existe nos dados
+        String cpf = "";
+        while(true){
+            try {
+                System.out.print("CPF (apenas números ou com pontuação): ");
+                String entrada = scanner.nextLine();
+                cpf = limparNumero(entrada);
+
+                if(cpf.length() != 11){
+                    throw new CPFInvalidoException("CPF inválido! Deve conter exatamente 11 dígitos numéricos.");
+                }
+
+                if(gerenciador.buscarClientePorCpf(cpf) != null) {
+                    throw new CPFInvalidoException("Erro: Este CPF já está cadastrado no sistema.");
+                }
+                break;
+            } catch (CPFInvalidoException e) {
+                System.out.println(e.getMessage());
+                System.out.println("Tente novamente.\n");
+            }
+
+        }
+
+
+        System.out.print("Telefone (Com DDD): ");
+        String telefone = limparNumero(scanner.nextLine());
 
         Cliente novoCliente = new Cliente(nome, cpf, telefone);
         gerenciador.cadastrarCliente(novoCliente);
         System.out.println("Cliente cadastrado com sucesso!");
     }
 
+    // ! Função para cadastrar um novo barbeiro
     private static void cadastrarBarbeiro() {
         System.out.println("\n--- NOVO BARBEIRO ---");
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
-        System.out.print("CPF: ");
-        String cpf = scanner.nextLine();
-        System.out.print("Telefone: ");
-        String telefone = scanner.nextLine();
+        
+        String cpf = "";
+        while (true) {
+            try {
+                System.out.print("CPF (digite com ou sem pontos): ");
+                String entrada = scanner.nextLine();
+                cpf = limparNumero(entrada);
+                
+                if (cpf.length() != 11) {
+                    throw new CPFInvalidoException("CPF inválido! Deve conter exatamente 11 dígitos numéricos.");
+                }
+                
+                if (gerenciador.buscarBarbeiroPorCpf(cpf) != null) {
+                    throw new CPFInvalidoException("Erro: Este CPF já está cadastrado no sistema.");
+                }
+                break;
+                
+            } catch (CPFInvalidoException e) {
+                System.out.println(e.getMessage());
+                System.out.println("Tente novamente.\n");
+            }
+        }
+
+        System.out.print("Telefone (Com DDD): ");
+        String telefone = limparNumero(scanner.nextLine());
         System.out.print("Especialidade (ex: Corte, Barba): ");
         String especialidade = scanner.nextLine();
         
@@ -248,25 +299,61 @@ public class Main {
         System.out.println("Barbeiro cadastrado com sucesso!");
     }
 
+    // ! Função para cadastro de um serviço
     private static void cadastrarServico() {
         System.out.println("\n--- NOVO SERVIÇO ---");
+        
+        
         System.out.print("Nome do serviço (ex: Corte Masculino): ");
-        String nome = scanner.nextLine();
+        String nome = "";
+        while(true){
+            String entrada = scanner.nextLine();
+
+            if(entrada.trim().isEmpty()) {
+                System.out.println("Por favor digite o nome do serviço");
+                continue;
+            }
+
+            if(gerenciador.buscarServicoPorNome(entrada) != null){
+                System.out.println("Erro: Já existe um serviço cadastrado com esse nome ou muito similar.");
+                System.out.println("Tente outro nome.");
+            } else {
+                nome = entrada;
+                break;
+            }
+        }
         
         double valor = 0;
-        try {
-            System.out.print("Valor (ex: 35.00): ");
-            valor = Double.parseDouble(scanner.nextLine().replace(",", "."));
-        } catch (NumberFormatException e) {
-            System.out.println("Valor inválido.");
+        while (true) {
+            try {
+                System.out.print("Valor (ex: 35.00): ");
+                String entrada = scanner.nextLine().replace(",", ".");
+                valor = Double.parseDouble(entrada);
+                
+                if (valor <= 0) {
+                    System.out.println("O valor deve ser maior que zero.");
+                    continue;
+                }
+                break; // Sai do loop se der certo
+            } catch (NumberFormatException e) {
+                System.out.println("Valor inválido! Digite apenas números (ex: 35.50).");
+            }
         }
 
         int tempo = 0;
-        try {
-            System.out.print("Tempo estimado em minutos (ex: 30): ");
-            tempo = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Tempo inválido.");
+        while (true) {
+            try {
+                System.out.print("Tempo estimado em minutos (ex: 30): ");
+                tempo = Integer.parseInt(scanner.nextLine());
+                
+                if (tempo <= 0) {
+                    System.out.println("O tempo deve ser maior que zero.");
+                    continue;
+                }
+                break; // Sai do loop se der certo
+            } catch (NumberFormatException e) {
+                System.out.println("Tempo inválido! Digite apenas números inteiros.");
+            }
         }
 
         Servico novoServico = new Servico(nome, valor, tempo);
@@ -274,27 +361,69 @@ public class Main {
         System.out.println("Serviço cadastrado com sucesso!");
     }
 
+    // ! Função para cadastro de um produto
     private static void cadastrarProduto() {
         System.out.println("\n--- NOVO PRODUTO ---");
-        System.out.print("Nome do produto (ex: Pomada Modeladora): ");
-        String nome = scanner.nextLine();
-        System.out.print("Marca: ");
-        String marca = scanner.nextLine();
+        String nome = "";
+        String marca = "";
+
+        while(true){
+            System.out.print("Nome do produto(ex: Pomada Modeladora): ");
+            nome = scanner.nextLine();
+
+            if(nome.trim().isEmpty()) {
+                System.out.println("O nome não pode ser vazio");
+                continue;
+            }
+
+            System.out.print("Marca (ex: BarberX): ");
+            marca = scanner.nextLine();
+
+            if(marca.trim().isEmpty()) {
+                System.out.println("A marca não pode ser vazia.");
+                continue;
+            }
+
+            if(gerenciador.buscaProdutoPorNomeEMarca(nome, marca) != null) {
+                System.out.println("Erro: Já existe um produto '" + nome + "' desta mesma marca (" + marca + ") cadastrado.");
+                System.out.println("Tente novamente ou verifique se já foi cadastrado.\n");
+            } else {
+                break;
+            }
+
+        }
         
         double valor = 0;
-        try {
-            System.out.print("Preço de Venda: ");
-            valor = Double.parseDouble(scanner.nextLine().replace(",", "."));
-        } catch (NumberFormatException e) {
-            System.out.println("Valor inválido.");
+        while(true){
+            try{
+                System.out.print("Preço de Venda: ");
+                String entrada = scanner.nextLine().replace(",", ".");
+                valor = Double.parseDouble(entrada);
+
+                if(valor <= 0){
+                    System.out.println("O preço deve ser maior que zero.");
+                    continue;
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Valor inválido! Digite apenas números.");
+            }
         }
 
         int estoque = 0;
-        try {
-            System.out.print("Quantidade em Estoque: ");
-            estoque = Integer.parseInt(scanner.nextLine());
+        while(true) {
+            try {
+                System.out.print("Quantidade em Estoque: ");
+                estoque = Integer.parseInt(scanner.nextLine());
+
+                if(estoque < 0) {
+                    System.out.println("O estoque não pode ser negativo.");
+                    continue;
+                }
+                break;
         } catch (NumberFormatException e) {
-            System.out.println("Quantidade inválida.");
+            System.out.println("Quantidade inválida! Digite um número inteiro.");
+        }
         }
 
         Produto novoProduto = new Produto(nome, valor, estoque, marca);
@@ -302,25 +431,61 @@ public class Main {
         System.out.println("Produto cadastrado com sucesso!");
     }
 
+    // ! Função para cadastro de insumo 
     private static void cadastrarInsumo() {
         System.out.println("\n--- NOVO INSUMO ---");
-        System.out.print("Nome do insumo (ex: Lâmina de Barbear): ");
-        String nome = scanner.nextLine();
         
+        String nome = "";
+        while(true){
+            System.out.print("Nome do insumo (ex: Lâmina de Barbear): ");
+            String entrada = scanner.nextLine();
+
+            if(entrada.trim().isEmpty()) {
+                System.out.println("O nome não pode ser vazio.");
+                continue;
+            }
+
+            if(gerenciador.buscarInsumoPorNome(entrada) != null){
+                System.out.println("Erro: Já existe um insumo cadastrado com este nome.");
+                System.out.println("Dica: Se deseja aumentar a quantidade, edite o estoque.");
+            } else {
+                nome = entrada;
+                break;
+            }
+        }
+
         double custo = 0;
-        try {
-            System.out.print("Custo Unitário: ");
-            custo = Double.parseDouble(scanner.nextLine().replace(",", "."));
-        } catch (NumberFormatException e) {
-            System.out.println("Valor inválido.");
+        while(true){
+            try {
+                System.out.print("Custo Unitário: ");
+                String entrada = scanner.nextLine().replace(",", ".");
+                custo = Double.parseDouble(entrada);
+
+                if(custo <= 0){
+                    System.out.println("O custo deve ser maior que zero.");
+                    continue;
+                }
+                break;
+            }catch (NumberFormatException e) {
+                System.out.println("Valor inválido! Digite apenas números (ex: 5.50).");
+            }
+
         }
 
         int estoque = 0;
-        try {
-            System.out.print("Quantidade em Estoque: ");
-            estoque = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Quantidade inválida.");
+        while(true){
+            try {
+                System.out.println("Quantidade em Estoque: ");
+                estoque = Integer.parseInt(scanner.nextLine());
+
+                if(estoque < 0){
+                    System.out.println("O estoque não pode ser negativo.");
+                    continue;
+                }
+                break;
+            } catch(NumberFormatException e) {
+                System.out.println("Quantidade inválida! Digite um número inteiro.");
+            }
         }
 
         Insumo novoInsumo = new Insumo(nome, estoque, custo);
@@ -328,30 +493,66 @@ public class Main {
         System.out.println("Insumo cadastrado com sucesso!");
     }
 
+    // ! Função para cadastro de promoção
     private static void cadastrarPromocao() {
         System.out.println("\n--- NOVA PROMOÇÃO ---");
-        System.out.print("Nome da promoção (ex: Black Friday): ");
-        String nome = scanner.nextLine();
+
+        String nome = "";
+        while (true) {
+            System.out.print("Nome da promoção (ex: Black Friday): ");
+            String entrada = scanner.nextLine();
+
+            if (entrada.trim().isEmpty()) {
+                System.out.println("O nome não pode ser vazio.");
+                continue;
+            }
+
+            if (gerenciador.buscarPromocaoPorNome(entrada) != null) {
+                System.out.println("Erro: Já existe uma promoção cadastrada com este nome.");
+            } else {
+                nome = entrada;
+                break;
+            }
+        }
         
+
         double desconto = 0;
-        try {
-            System.out.print("Porcentagem de desconto (ex: 15 para 15%): ");
-            desconto = Double.parseDouble(scanner.nextLine().replace(",", "."));
-        } catch (NumberFormatException e) {
-            System.out.println("Valor inválido.");
+        while (true) {
+            try {
+                System.out.print("Porcentagem de desconto (ex: 15 para 15%): ");
+                String entrada = scanner.nextLine().replace(",", ".");
+                desconto = Double.parseDouble(entrada);
+                
+                if (desconto <= 0 || desconto > 100) {
+                    System.out.println("O desconto deve ser maior que 0% e menor ou igual a 100%.");
+                    continue;
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Valor inválido! Digite apenas números.");
+            }
         }
 
-        java.time.LocalDate inicio = java.time.LocalDate.now();
-        java.time.LocalDate fim = java.time.LocalDate.now();
+        java.time.LocalDate inicio = null;
+        java.time.LocalDate fim = null;
         
-        try {
-            System.out.print("Data de Início (AAAA-MM-DD): ");
-            inicio = java.time.LocalDate.parse(scanner.nextLine());
-            
-            System.out.print("Data de Fim (AAAA-MM-DD): ");
-            fim = java.time.LocalDate.parse(scanner.nextLine());
-        } catch (java.time.format.DateTimeParseException e) {
-            System.out.println("Data inválida! Usando data de hoje para evitar erro.");
+        while (true) {
+            try {
+                System.out.print("Data de Início (AAAA-MM-DD): ");
+                inicio = java.time.LocalDate.parse(scanner.nextLine());
+                
+                System.out.print("Data de Fim (AAAA-MM-DD): ");
+                fim = java.time.LocalDate.parse(scanner.nextLine());
+                
+                if (fim.isBefore(inicio)) {
+                    System.out.println("Erro: A data final não pode ser anterior à data inicial.");
+                    continue;
+                }
+                break;
+                
+            } catch (java.time.format.DateTimeParseException e) {
+                System.out.println("Data inválida! Use o formato AAAA-MM-DD (ex: 2025-12-25).");
+            }
         }
 
         Promocao novaPromocao = new Promocao(nome, desconto, inicio, fim);
@@ -365,7 +566,7 @@ public class Main {
         System.out.println("\n--- NOVO AGENDAMENTO ---");
 
         System.out.print("Digite o CPF do Cliente: ");
-        String cpfCliente = scanner.nextLine();
+        String cpfCliente = limparNumero(scanner.nextLine());
         Cliente cliente = gerenciador.buscarClientePorCpf(cpfCliente);
         
         if (cliente == null) {
@@ -442,7 +643,7 @@ public class Main {
         System.out.println("\n--- ABRINDO NOVA COMANDA ---");
 
         System.out.print("CPF do Cliente: ");
-        String cpf = scanner.nextLine();
+        String cpf = limparNumero(scanner.nextLine());
         Cliente cliente = gerenciador.buscarClientePorCpf(cpf);
 
         if (cliente == null) {
@@ -720,6 +921,14 @@ public class Main {
         } catch (NumberFormatException e) {
             System.out.println("Opção inválida.");
         }
+    }
+
+
+    // ? Funções auxiliares
+
+    private static String limparNumero(String dado) { // Função para limpar os caracteres que não são digitos
+        if (dado == null) return "";
+        return dado.replaceAll("\\D", "");
     }
 
     //Função para limpar a tela
