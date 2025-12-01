@@ -11,10 +11,16 @@ public abstract class ItemComercializavel{
 
     public abstract double getPreco();
 
+    // getters
     public String getNome(){
         return nome;
     }
     public double getValorBase(){
         return valorBase;
+    }
+
+    // setters
+    public void setValorBase(double valorBase) {
+        this.valorBase = valorBase;
     }
 }

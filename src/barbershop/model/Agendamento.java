@@ -44,4 +44,8 @@ public class Agendamento{
     public void setStatus(StatusAgendamento status){
         this.status = status;
     }
+
+    public void setDataHora(LocalDateTime dataHora) {
+        this.dataHora = dataHora;
+    }
 }

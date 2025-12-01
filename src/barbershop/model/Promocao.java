@@ -37,4 +37,9 @@ public class Promocao {
     public LocalDate getDataFim(){
         return dataFim; 
     }
+
+    // setters
+    public void setDescontoPercentual(double descontoPercentual) {
+        this.descontoPercentual = descontoPercentual;
+    }
 }

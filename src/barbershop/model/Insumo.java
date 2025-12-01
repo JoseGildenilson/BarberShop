@@ -38,4 +38,13 @@ public class Insumo{
     public double getCustoUnitario(){
         return custoUnitario;
     }
+
+    // setters
+    public void setQtdEstoque(int qtdEstoque) {
+        this.qtdEstoque = qtdEstoque;
+    }
+
+    public void setCustoUnitario(double custoUnitario) {
+        this.custoUnitario = custoUnitario;
+    }
 }

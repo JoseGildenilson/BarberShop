@@ -25,4 +25,13 @@ public class Barbeiro extends Pessoa{
     public double getComissao(){
         return comissao;
     }
+
+    // setters
+    public void setEspecialidade(String especialidade) {
+        this.especialidade = especialidade;
+    }
+
+    public void setComissao(double comissao) {
+        this.comissao = comissao;
+    }
 }   

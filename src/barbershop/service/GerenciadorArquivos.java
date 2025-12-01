@@ -10,6 +10,7 @@ import java.util.List;
 public class GerenciadorArquivos {
     private static final String DIRETORIO_DADOS = "dados";
 
+    private static final String ARQUIVO_CATEGORIAS = DIRETORIO_DADOS + File.separator + "categorias.csv";
     private static final String ARQUIVO_PRODUTOS = DIRETORIO_DADOS + File.separator + "produtos.csv";
     private static final String ARQUIVO_SERVICOS = DIRETORIO_DADOS + File.separator + "servicos.csv";
     private static final String ARQUIVO_CLIENTES = DIRETORIO_DADOS + File.separator + "clientes.csv";
@@ -239,6 +240,54 @@ public class GerenciadorArquivos {
         return agendamentos;
     }
 
+    // ! Método para reescrever um agendamento
+    public void reescreverAgendamentos(List<Agendamento> agendamentos) {
+        List<String> linhas = new ArrayList<>();
+        for (Agendamento a : agendamentos) {
+            String linha = String.format("%s;%s;%s;%s;%s",
+                    a.getCliente().getCpf(),
+                    a.getBarbeiro().getCpf(),
+                    a.getServico().getNome(),
+                    a.getDataHora().toString(),
+                    a.getStatus().name());
+            linhas.add(linha);
+        }
+        sobrescreverArquivo(ARQUIVO_AGENDAMENTOS, linhas);
+    }
+
+
+    // --- Métodos para Categorias ---
+public void salvarCategoria(Categoria categoria) {
+    String linha = String.format("%s;%s", categoria.getNome(), categoria.getDescricao());
+    escreverNoArquivo(ARQUIVO_CATEGORIAS, linha);
+}
+
+public List<Categoria> carregarCategorias() {
+    List<Categoria> categorias = new ArrayList<>();
+    List<String> linhas = lerArquivo(ARQUIVO_CATEGORIAS);
+
+    for (String linha : linhas) {
+        try {
+            String[] dados = linha.split(";");
+            if (dados.length >= 2) {
+                categorias.add(new Categoria(dados[0], dados[1]));
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao ler categoria: " + linha);
+        }
+    }
+    return categorias;
+}
+
+public void reescreverCategorias(List<Categoria> categorias) {
+    List<String> linhas = new ArrayList<>();
+    for (Categoria c : categorias) {
+        String linha = String.format("%s;%s", c.getNome(), c.getDescricao());
+        linhas.add(linha);
+    }
+    sobrescreverArquivo(ARQUIVO_CATEGORIAS, linhas);
+}
+
     // --- Métodos Auxiliares de Busca ---
     private Cliente buscarClientePorCpf(List<Cliente> clientes, String cpf) {
         for (Cliente c : clientes) {
@@ -326,6 +375,45 @@ public class GerenciadorArquivos {
             linhas.add(linha);
         }
         sobrescreverArquivo(ARQUIVO_BARBEIROS, linhas);
+    }
+
+    // --- MÉTODOS DE ATUALIZAÇÃO (REESCREVER ARQUIVOS FALTANTES) ---
+
+    // Sobrescreve (update) serviços
+    public void reescreverServicos(List<Servico> servicos) {
+        List<String> linhas = new ArrayList<>();
+        for (Servico s : servicos) {
+            // Formato: nome;valor;tempo
+            String linha = String.format("%s;%.2f;%d",
+                    s.getNome(), s.getValorBase(), s.getTempoEstimado());
+            linhas.add(linha);
+        }
+        sobrescreverArquivo(ARQUIVO_SERVICOS, linhas);
+    }
+
+    // Sobrescreve (update) insumos
+    public void reescreverInsumos(List<Insumo> insumos) {
+        List<String> linhas = new ArrayList<>();
+        for (Insumo i : insumos) {
+            // Formato: nome;qtd;custo
+            String linha = String.format("%s;%d;%.2f",
+                    i.getNome(), i.getQtdEstoque(), i.getCustoUnitario());
+            linhas.add(linha);
+        }
+        sobrescreverArquivo(ARQUIVO_INSUMOS, linhas);
+    }
+
+    // Sobrescreve (update) promoções
+    public void reescreverPromocoes(List<Promocao> promocoes) {
+        List<String> linhas = new ArrayList<>();
+        for (Promocao p : promocoes) {
+            // Formato: nome;desconto;inicio;fim
+            String linha = String.format("%s;%.2f;%s;%s",
+                    p.getNome(), p.getDescontoPercentual(),
+                    p.getDataInicio().toString(), p.getDataFim().toString());
+            linhas.add(linha);
+        }
+        sobrescreverArquivo(ARQUIVO_PROMOCOES, linhas);
     }
 
     // Método genérico para sobrescrever (append=false)

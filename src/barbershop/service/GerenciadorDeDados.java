@@ -18,6 +18,7 @@ public class GerenciadorDeDados {
     private List<Insumo> insumos;
     private List<Promocao> promocoes;
     private List<Agendamento> agendamentos;
+    private List<Categoria> categorias;
 
     //Construtor
     public GerenciadorDeDados() {
@@ -29,6 +30,7 @@ public class GerenciadorDeDados {
         this.insumos = new ArrayList<>();
         this.promocoes = new ArrayList<>();
         this.agendamentos = new ArrayList<>();
+        this.categorias = new ArrayList<>();
 
         carregarDadosIniciais();
     }
@@ -112,6 +114,10 @@ public class GerenciadorDeDados {
         return agendamentos;
     }
 
+    public List<Categoria> getCategorias() {
+        return categorias;
+    }
+
     // ? --- BUSCA ---
 
     // ! Verificar se o CPF cliente existe no arquivo 
@@ -175,9 +181,7 @@ public class GerenciadorDeDados {
         return null;
     }
 
-    // ! verifica se o produto existe no arquivo
-
-
+    // ! verifica se o promoção existe no arquivo
     public Promocao buscarPromocaoPorNome(String nome) {
         String nomeBusca = normalizaTexto(nome);
         
@@ -187,6 +191,21 @@ public class GerenciadorDeDados {
             }
         }
         return null;
+    }
+
+    // ! Busca o agendamento de um cliente
+    public List<Agendamento> buscarAgendamentosPorCliente(Cliente cliente) {
+        List<Agendamento> lista = new ArrayList<>();
+        for (Agendamento a : agendamentos) {
+            if (a.getCliente().getCpf().equals(cliente.getCpf())) {
+                lista.add(a);
+            }
+        }
+        return lista;
+    }
+
+    public void atualizarStatusAgendamento() {
+        gerenciadorArquivos.reescreverAgendamentos(this.agendamentos);
     }
 
     // --- MÉTODOS PARA SALVAR ALTERAÇÕES GERAIS (UPDATE) ---
@@ -199,8 +218,9 @@ public class GerenciadorDeDados {
         gerenciadorArquivos.reescreverClientes(this.clientes);
     }
 
-    // --- MÉTODOS DE REMOÇÃO E EDIÇÃO ---
+    // ? --- MÉTODOS DE REMOÇÃO E EDIÇÃO ---
 
+    // ! Função para remover cliente 
     public boolean removerCliente(String cpf) {
         Cliente clienteParaRemover = buscarClientePorCpf(cpf);
         if (clienteParaRemover != null) {
@@ -211,6 +231,7 @@ public class GerenciadorDeDados {
         return false;
     }
 
+    // ! Função para remover barbeiro 
     public boolean removerBarbeiro(String cpf) {
         Barbeiro barbeiroParaRemover = null;
         for (Barbeiro b : barbeiros) {
@@ -228,12 +249,86 @@ public class GerenciadorDeDados {
         return false;
     }
     
-    // Método para salvar qualquer alteração feita nos objetos de cliente (ex: edição de telefone)
+    // ! Função para remover agendamento 
+    public void removerAgendamento(Agendamento agendamento) {
+        agendamentos.remove(agendamento); // Remove da memória
+        gerenciadorArquivos.reescreverAgendamentos(this.agendamentos); // Atualiza arquivo
+    }
+
+    // ! Função para remover Produto
+    public boolean removerProduto(String nome) {
+        for (Produto p : produtos) {
+            if (normalizaTexto(p.getNome()).equals(normalizaTexto(nome))) {
+                produtos.remove(p);
+                gerenciadorArquivos.reescreverProdutos(this.produtos);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void salvarAlteracoesProdutos() {
+        gerenciadorArquivos.reescreverProdutos(this.produtos);
+    }
+
+    // ! Função para remover serviço
+    public boolean removerServico(String nome) {
+        Servico s = buscarServicoPorNome(nome);
+        if (s != null) {
+            servicos.remove(s);
+            gerenciadorArquivos.reescreverServicos(this.servicos);
+            return true;
+        }
+        return false;
+    }
+
+    public void salvarAlteracoesServicos() {
+        gerenciadorArquivos.reescreverServicos(this.servicos);
+    }
+
+    // ! Função para remover Insumo 
+    public boolean removerInsumo(String nome) {
+        Insumo i = buscarInsumoPorNome(nome);
+        if (i != null) {
+            insumos.remove(i);
+            gerenciadorArquivos.reescreverInsumos(this.insumos);
+            return true;
+        }
+        return false;
+    }
+
+    
+    public void salvarAlteracoesInsumos() {
+        gerenciadorArquivos.reescreverInsumos(this.insumos);
+    }
+
+    // ! Função para remover Promoção
+    public boolean removerPromocao(String nome) {
+        Promocao p = buscarPromocaoPorNome(nome);
+        if (p != null) {
+            promocoes.remove(p);
+            gerenciadorArquivos.reescreverPromocoes(this.promocoes);
+            return true;
+        }
+        return false;
+    }
+
+    public void salvarAlteracoesPromocoes() {
+        gerenciadorArquivos.reescreverPromocoes(this.promocoes);
+    }
+
+    // ! Função para salvar as alterações no agendamento
+    public void salvarAlteracoesAgendamentos() {
+        gerenciadorArquivos.reescreverAgendamentos(this.agendamentos);
+    }
+    
+
+    // ! Função para salvar qualquer alteração feita nos objetos de cliente 
     public void salvarAlteracoesClientes() {
         gerenciadorArquivos.reescreverClientes(this.clientes);
     }
 
-    // Método para salvar alterações nos objetos de barbeiro
+    // ! Método para salvar alterações nos objetos de barbeiro 
     public void salvarAlteracoesBarbeiros() {
         gerenciadorArquivos.reescreverBarbeiros(this.barbeiros);
     }
@@ -280,4 +375,37 @@ public class GerenciadorDeDados {
             }
         }
     }
+
+
+    // --- MÉTODOS CRUD CATEGORIA ---
+
+    public void cadastrarCategoria(Categoria categoria) {
+        categorias.add(categoria);
+        gerenciadorArquivos.salvarCategoria(categoria);
+    }
+
+    public Categoria buscarCategoriaPorNome(String nome) {
+        String nomeBusca = normalizaTexto(nome);
+        for (Categoria c : categorias) {
+            if (normalizaTexto(c.getNome()).equals(nomeBusca)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public boolean removerCategoria(String nome) {
+        Categoria c = buscarCategoriaPorNome(nome);
+        if (c != null) {
+            categorias.remove(c);
+            gerenciadorArquivos.reescreverCategorias(this.categorias);
+            return true;
+        }
+        return false;
+    }
+
+    public void salvarAlteracoesCategorias() {
+        gerenciadorArquivos.reescreverCategorias(this.categorias);
+    }
+    
 }

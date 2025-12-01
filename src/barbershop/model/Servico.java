@@ -32,5 +32,10 @@ public class Servico extends ItemComercializavel implements Agendavel{
     //Método da classe
     public int getTempoEstimado(){
         return tempoEstimado;
-    } 
+    }
+    
+    public void setTempoEstimado(int tempoEstimado) {
+        this.tempoEstimado = tempoEstimado;
+    }
+
 }
