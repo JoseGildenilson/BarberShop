@@ -560,8 +560,9 @@ public class Main {
         System.out.println("Promoção cadastrada com sucesso!");
     }
 
-    // --- Métodos de Agendamento ---
+    // ? --- Métodos de Agendamento ---
 
+    // ! Função para fazer o agendamento
     private static void realizandoAgendamento() {
         System.out.println("\n--- NOVO AGENDAMENTO ---");
 
@@ -614,15 +615,20 @@ public class Main {
         try {
             java.time.LocalDateTime dataHora = java.time.LocalDateTime.parse(dataStr);
             
+            gerenciador.verificarDisponibilidade(barbeiro, dataHora, servico.getTempoEstimado());
+            
             Agendamento agendamento = new Agendamento(cliente, barbeiro, servico, dataHora);
             gerenciador.agendar(agendamento);
             System.out.println("Agendamento realizado com sucesso!");
 
         } catch (java.time.format.DateTimeParseException e) {
             System.out.println("Formato de data inválido! Use o formato: 2025-12-10T14:30");
+        } catch (HorarioIndisponivelException e) {
+            System.out.println("ERRO DE AGENDAMENTO: " + e.getMessage());
         }
     }
 
+    // ! Função para listar todos os agendamentos
     private static void listarAgendamentos() {
         System.out.println("\n--- LISTA DE AGENDAMENTOS ---");
         if (gerenciador.getAgendamentos().isEmpty()) {
@@ -637,7 +643,7 @@ public class Main {
         }
     }
 
-    // --- Métodos de Venda ---
+    // ? --- Métodos de Venda ---
 
     private static void novaVenda() {
         System.out.println("\n--- ABRINDO NOVA COMANDA ---");

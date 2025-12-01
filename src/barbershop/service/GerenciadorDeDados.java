@@ -1,8 +1,10 @@
 package barbershop.service;
 
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 import barbershop.model.*;
+import barbershop.exception.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -249,5 +251,33 @@ public class GerenciadorDeDados {
         String semAcento = pattern.matcher(nfdNormalizedString).replaceAll("");
 
         return semAcento.toLowerCase().replace(" ", "");
+    }
+
+    // ! Função para verificar a diposnibilidade 
+
+    public void verificarDisponibilidade(Barbeiro barbeiro, LocalDateTime inicioNovo, int tempoServico) throws HorarioIndisponivelException {
+        LocalDateTime fimNovo = inicioNovo.plusMinutes(tempoServico);
+
+        for (Agendamento agendamento : agendamentos) {
+            if (!agendamento.getBarbeiro().getCpf().equals(barbeiro.getCpf())) {
+                continue;
+            }
+
+            if (agendamento.getStatus() == StatusAgendamento.CANCELADO) {
+                continue;
+            }
+
+            LocalDateTime inicioExistente = agendamento.getDataHora();
+            int duracaoExistente = agendamento.getServico().getTempoEstimado();
+            LocalDateTime fimExistente = inicioExistente.plusMinutes(duracaoExistente);
+
+            if (inicioNovo.isBefore(fimExistente) && fimNovo.isAfter(inicioExistente)) {
+                throw new HorarioIndisponivelException(
+                    "Conflito de horário! O barbeiro " + barbeiro.getNome() + 
+                    " já tem agendamento das " + inicioExistente.toLocalTime() + 
+                    " às " + fimExistente.toLocalTime()
+                );
+            }
+        }
     }
 }
