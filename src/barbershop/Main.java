@@ -18,7 +18,6 @@ public class Main {
         String nome = prefs.getNomeUsuario();
         String tema = prefs.getTema();
 
-        limparTela();
         System.out.println("=== BEM-VINDO AO BARBERSHOP MANAGER ===");
         System.out.println("Olá, " + nome + "! (Tema atual: " + tema + ")");
         System.out.println("=======================================");
@@ -77,7 +76,6 @@ public class Main {
     private static void menuCadastros() {
         int opcao = -1;
         while (opcao != 0) {
-            limparTela();
             System.out.println("\n--- MENU DE CADASTROS ---");
             System.out.println("1. Cadastrar Cliente");
             System.out.println("2. Cadastrar Barbeiro");
@@ -113,7 +111,6 @@ public class Main {
     private static void menuAgendamentos() {
         int opcao = -1;
         while (opcao != 0) {
-            limparTela();
             System.out.println("\n--- MENU DE AGENDAMENTOS ---");
             System.out.println("1. Novo Agendamento");
             System.out.println("2. Listar Agendamentos");
@@ -202,7 +199,6 @@ public class Main {
     private static void menuManutencao() {
         int opcao = -1;
         while (opcao != 0) {
-            limparTela();
             System.out.println("\n--- MANUTENÇÃO DE CADASTROS ---");
             System.out.println("1. Remover Cliente");
             System.out.println("2. Editar Telefone do Cliente");
@@ -386,13 +382,21 @@ public class Main {
     }
 
     // ! Função para cadastro de um produto
-    private static void cadastrarProduto() {
+   private static void cadastrarProduto() {
         System.out.println("\n--- NOVO PRODUTO ---");
+        
+        // 1. Validação se existem categorias antes de começar
+        if (gerenciador.getCategorias().isEmpty()) {
+            System.out.println("Erro: Não há categorias cadastradas. Cadastre uma categoria antes de criar produtos.");
+            return; // Sai do método se não houver categorias
+        }
+
         String nome = "";
         String marca = "";
-
+        
+        // 2. Loop para validar Nome e Marca (Unicidade)
         while(true){
-            System.out.print("Nome do produto(ex: Pomada Modeladora): ");
+            System.out.print("Nome do produto (ex: Pomada Modeladora): ");
             nome = scanner.nextLine();
 
             if(nome.trim().isEmpty()) {
@@ -410,13 +414,34 @@ public class Main {
 
             if(gerenciador.buscaProdutoPorNomeEMarca(nome, marca) != null) {
                 System.out.println("Erro: Já existe um produto '" + nome + "' desta mesma marca (" + marca + ") cadastrado.");
-                System.out.println("Tente novamente ou verifique se já foi cadastrado.\n");
+                System.out.println("Tente novamente.\n");
             } else {
-                break;
+                break; // Sai do loop se o nome/marca forem válidos
             }
+        }
 
+        // 3. Seleção de Categoria (AGORA FORA DO LOOP ANTERIOR)
+        Categoria categoriaSelecionada = null;
+        System.out.println("--- Escolha uma Categoria ---");
+        for (int i = 0; i < gerenciador.getCategorias().size(); i++) {
+            System.out.println((i + 1) + ". " + gerenciador.getCategorias().get(i).getNome());
         }
         
+        while(categoriaSelecionada == null) {
+            System.out.print("Digite o número da categoria: ");
+            try {
+                int opCat = Integer.parseInt(scanner.nextLine());
+                if (opCat > 0 && opCat <= gerenciador.getCategorias().size()) {
+                    categoriaSelecionada = gerenciador.getCategorias().get(opCat - 1);
+                } else {
+                    System.out.println("Opção inválida.");
+                }
+            } catch (Exception e) {
+                System.out.println("Número inválido.");
+            }
+        }
+        
+        // 4. Preço
         double valor = 0;
         while(true){
             try{
@@ -434,6 +459,7 @@ public class Main {
             }
         }
 
+        // 5. Estoque
         int estoque = 0;
         while(true) {
             try {
@@ -445,12 +471,13 @@ public class Main {
                     continue;
                 }
                 break;
-        } catch (NumberFormatException e) {
-            System.out.println("Quantidade inválida! Digite um número inteiro.");
-        }
+            } catch (NumberFormatException e) {
+                System.out.println("Quantidade inválida! Digite um número inteiro.");
+            }
         }
 
-        Produto novoProduto = new Produto(nome, valor, estoque, marca);
+        // 6. Criação e Cadastro
+        Produto novoProduto = new Produto(nome, valor, estoque, marca, categoriaSelecionada);
         gerenciador.cadastrarProduto(novoProduto);
         System.out.println("Produto cadastrado com sucesso!");
     }
@@ -1045,10 +1072,6 @@ public class Main {
         return dado.replaceAll("\\D", "");
     }
 
-    public static void limparTela() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
 
     // Método auxiliar para facilitar a escolha de um agendamento
     private static Agendamento selecionarAgendamentoDoCliente() {

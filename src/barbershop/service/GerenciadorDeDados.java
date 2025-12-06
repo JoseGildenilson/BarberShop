@@ -38,13 +38,16 @@ public class GerenciadorDeDados {
     private void carregarDadosIniciais() {
         System.out.println("Carregando dados do sistema...");
         
+        this.categorias = gerenciadorArquivos.carregarCategorias();
+        
         this.clientes = gerenciadorArquivos.carregarClientes();
         this.barbeiros = gerenciadorArquivos.carregarBarbeiros();
         this.servicos =  gerenciadorArquivos.carregaServicos();
-        this.produtos = gerenciadorArquivos.carregaProdutos();
+        
+        this.produtos = gerenciadorArquivos.carregaProdutos(this.categorias);
+        
         this.insumos = gerenciadorArquivos.carregarInsumos();
         this.promocoes = gerenciadorArquivos.carregarPromocoes();
-
         this.agendamentos = gerenciadorArquivos.carregarAgendamentos(clientes, barbeiros, servicos);
 
         System.out.println("Dados carregados com sucesso!");

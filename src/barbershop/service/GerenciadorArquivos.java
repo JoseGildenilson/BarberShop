@@ -32,27 +32,48 @@ public class GerenciadorArquivos {
 
     // --- Métodos para Produtos ---
     public void salvarProdutos(Produto produto){
-        String linha = String.format("%s;%.2f;%d;%s",produto.getNome(), produto.getValorBase(), produto.getQtdEstoque(), produto.getMarca());
+        String nomeCat = (produto.getCategoria() != null) ? produto.getCategoria().getNome() : "Sem Categoria";
+        
+        String linha = String.format("%s;%.2f;%d;%s;%s", 
+            produto.getNome(), 
+            produto.getValorBase(), 
+            produto.getQtdEstoque(), 
+            produto.getMarca(),
+            nomeCat
+        );
         escreverNoArquivo(ARQUIVO_PRODUTOS, linha);
     }
 
-    public List<Produto> carregaProdutos(){
+    public List<Produto> carregaProdutos(List<Categoria> categoriasDisponiveis){
         List<Produto> produtos = new ArrayList<>();
         List<String> linhas = lerArquivo(ARQUIVO_PRODUTOS);
 
         for(String linha : linhas){
             try {
                 String[] dados = linha.split(";");
-                if(dados.length >= 4) {
+                if(dados.length >= 5) {
                     String nome = dados[0];
                     double valor = Double.parseDouble(dados[1].replace(",", "."));
                     int qtd = Integer.parseInt(dados[2]);
                     String marca = dados[3];
+                    String nomeCategoria = dados[4];
 
-                    produtos.add(new Produto(nome, valor, qtd, marca));
+                    Categoria catEncontrada = null;
+                    for(Categoria c : categoriasDisponiveis){
+                        if(c.getNome().equalsIgnoreCase(nomeCategoria)){
+                            catEncontrada = c;
+                            break;
+                        }
+                    }
+                
+                    if(catEncontrada == null) {
+                         catEncontrada = new Categoria("Geral", "Categoria padrão");
+                    }
+
+                    produtos.add(new Produto(nome, valor, qtd, marca, catEncontrada));
                 }
-            } catch (NumberFormatException e) {
-                System.err.println("Erro ao ler linha de produto: " + linha);
+            } catch (Exception e) {
+                System.err.println("Erro ao ler produto: " + linha);
             }
         }
         return produtos;
@@ -348,8 +369,16 @@ public void reescreverCategorias(List<Categoria> categorias) {
     public void reescreverProdutos(List<Produto> produtos) {
         List<String> linhas = new ArrayList<>();
         for (Produto p : produtos) {
-            String linha = String.format("%s;%.2f;%d;%s",
-                    p.getNome(), p.getValorBase(), p.getQtdEstoque(), p.getMarca());
+            // Verifica se tem categoria, senão define um padrão para não quebrar o CSV
+            String nomeCat = (p.getCategoria() != null) ? p.getCategoria().getNome() : "Sem Categoria";
+            
+            // Formato: nome;preço;estoque;marca;categoria
+            String linha = String.format("%s;%.2f;%d;%s;%s",
+                    p.getNome(), 
+                    p.getValorBase(), 
+                    p.getQtdEstoque(), 
+                    p.getMarca(),
+                    nomeCat);
             linhas.add(linha);
         }
         sobrescreverArquivo(ARQUIVO_PRODUTOS, linhas);
