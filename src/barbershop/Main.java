@@ -200,15 +200,13 @@ public class Main {
         int opcao = -1;
         while (opcao != 0) {
             System.out.println("\n--- MANUTENÇÃO DE CADASTROS ---");
-            System.out.println("1. Remover Cliente");
-            System.out.println("2. Editar Telefone do Cliente");
-            System.out.println("3. Remover Barbeiro");
-            System.out.println("4. Editar Barbeiro (Comissão/Especialidade)");
-            System.out.println("5. Gerenciar Produtos (Editar/Remover)");
-            System.out.println("6. Gerenciar Serviços (Editar/Remover)");
-            System.out.println("7. Gerenciar Insumos (Editar/Remover)");
-            System.out.println("8. Gerenciar Promoções (Editar/Remover)");
-            System.out.println("9. Gerenciar Categorias (Editar/Remover)");
+            System.out.println("1. Gerenciar Clientes (Editar/Remover)");
+            System.out.println("2. Gerenciar Barbeiros (Editar/Remover)");
+            System.out.println("3. Gerenciar Produtos (Editar/Remover)");
+            System.out.println("4. Gerenciar Serviços (Editar/Remover)");
+            System.out.println("5. Gerenciar Insumos (Editar/Remover)");
+            System.out.println("6. Gerenciar Promoções (Editar/Remover)");
+            System.out.println("7. Gerenciar Categorias (Editar/Remover)");
             System.out.println("0. Voltar");
             System.out.print("Escolha: ");
 
@@ -219,15 +217,13 @@ public class Main {
             }
 
             switch (opcao) {
-                case 1: removerCliente(); break;
-                case 2: editarCliente(); break;
-                case 3: removerBarbeiro(); break;
-                case 4: editarBarbeiro(); break; 
-                case 5: gerenciarProdutos(); break; 
-                case 6: gerenciarServicos(); break; 
-                case 7: gerenciarInsumos(); break; 
-                case 8: removerPromocao(); break;
-                case 9: gerenciarCategorias(); break; 
+                case 1: gerenciarClientes(); break;  // Novo método unificado
+                case 2: gerenciarBarbeiros(); break; // Novo método unificado
+                case 3: gerenciarProdutos(); break; 
+                case 4: gerenciarServicos(); break; 
+                case 5: gerenciarInsumos(); break; 
+                case 6: removerPromocao(); break; // Lembre-se que renomeamos mentalmente para gerenciarPromocoes
+                case 7: gerenciarCategorias(); break; 
                 case 0: break;
                 default: System.out.println("Opção inválida.");
             }
@@ -1261,6 +1257,95 @@ public class Main {
         }
     }
     
+    private static void gerenciarClientes() {
+        System.out.println("\n--- GERENCIAR CLIENTES ---");
+        System.out.print("Digite o CPF do cliente: ");
+        String cpf = limparNumero(scanner.nextLine()); // Usando seu método auxiliar
+        Cliente cliente = gerenciador.buscarClientePorCpf(cpf);
+
+        if (cliente != null) {
+            System.out.println("Cliente encontrado: " + cliente.getNome());
+            System.out.println("Telefone atual: " + cliente.getTelefone());
+            System.out.println("Pontos: " + cliente.getPontosFidelidade());
+            System.out.println("-------------------------");
+            System.out.println("1. Editar Telefone");
+            System.out.println("2. Remover Cliente");
+            System.out.println("0. Cancelar");
+            System.out.print("Opção: ");
+            
+            String op = scanner.nextLine();
+
+            if (op.equals("1")) {
+                System.out.print("Novo Telefone (Com DDD): ");
+                String novoTel = limparNumero(scanner.nextLine());
+                cliente.setTelefone(novoTel);
+                gerenciador.salvarAlteracoesClientes();
+                System.out.println("Telefone atualizado com sucesso!");
+                
+            } else if (op.equals("2")) {
+                System.out.print("Tem certeza? Isso apagará o cliente permanentemente (S/N): ");
+                if (scanner.nextLine().equalsIgnoreCase("S")) {
+                    gerenciador.removerCliente(cpf);
+                    System.out.println("Cliente removido com sucesso!");
+                } else {
+                    System.out.println("Operação cancelada.");
+                }
+            }
+        } else {
+            System.out.println("Erro: Cliente não encontrado com este CPF.");
+        }
+    }
+
+    private static void gerenciarBarbeiros() {
+        System.out.println("\n--- GERENCIAR BARBEIROS ---");
+        System.out.print("Digite o CPF do barbeiro: ");
+        String cpf = limparNumero(scanner.nextLine());
+        Barbeiro b = gerenciador.buscarBarbeiroPorCpf(cpf);
+
+        if (b != null) {
+            System.out.println("Barbeiro: " + b.getNome()); 
+            System.out.println("Especialidade: " + b.getEspecialidade()); 
+            System.out.println("Comissão: " + b.getComissao() + "%");
+            System.out.println("-------------------------");
+            System.out.println("1. Editar Especialidade");
+            System.out.println("2. Editar Comissão");
+            System.out.println("3. Remover Barbeiro");
+            System.out.println("0. Cancelar");
+            System.out.print("Opção: ");
+            
+            String op = scanner.nextLine();
+
+            if (op.equals("1")) {
+                System.out.print("Nova Especialidade: ");
+                b.setEspecialidade(scanner.nextLine());
+                gerenciador.salvarAlteracoesBarbeiros();
+                System.out.println("Especialidade atualizada!");
+
+            } else if (op.equals("2")) {
+                System.out.print("Nova Comissão (ex: 15.0): ");
+                try {
+                    double novaComissao = Double.parseDouble(scanner.nextLine().replace(",", "."));
+                    b.setComissao(novaComissao);
+                    gerenciador.salvarAlteracoesBarbeiros();
+                    System.out.println("Comissão atualizada!");
+                } catch (NumberFormatException e) {
+                    System.out.println("Valor inválido.");
+                }
+
+            } else if (op.equals("3")) {
+                System.out.print("Tem certeza que deseja remover este barbeiro? (S/N): ");
+                if (scanner.nextLine().equalsIgnoreCase("S")) {
+                    gerenciador.removerBarbeiro(cpf);
+                    System.out.println("Barbeiro removido com sucesso!");
+                } else {
+                    System.out.println("Operação cancelada.");
+                }
+            }
+        } else {
+            System.out.println("Erro: Barbeiro não encontrado.");
+        }
+    }
+
     private static void removerPromocao() { 
         // Vamos renomear a chamada no switch case para este método se tornar "gerenciarPromocoes"
         // Mas se quiser manter o nome da função no switch, apenas substitua o conteúdo deste método:
