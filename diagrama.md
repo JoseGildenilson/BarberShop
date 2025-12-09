@@ -1,143 +1,144 @@
+```mermaid
 classDiagram
-    %% --- Pacote: barbershop.model.abstratas ---
+
     class Pessoa {
         <<abstract>>
-        -String nome
-        -String cpf
-        -String telefone
-        +Pessoa(String nome, String cpf, String telefone)
-        +exibirDados()* void
-        +getNome() String
-        +setNome(String nome) void
-        +getCpf() String
-        +getTelefone() String
-        +setTelefone(String telefone) void
+        -nome
+        -cpf
+        -telefone
+        +Pessoa(nome, cpf, telefone)
+        +exibirDados()* 
+        +getNome() 
+        +setNome(nome)
+        +getCpf() 
+        +getTelefone() 
+        +setTelefone(telefone)
     }
 
     class ItemComercializavel {
         <<abstract>>
-        #String nome
-        #double valorBase
-        +ItemComercializavel(String nome, double valorBase)
-        +getPreco()* double
-        +getNome() String
-        +getValorBase() double
-        +setValorBase(double valorBase) void
+        #nome
+        #valorBase
+        +ItemComercializavel(nome, valorBase)
+        +getPreco()* 
+        +getNome() 
+        +getValorBase() 
+        +setValorBase(valorBase)
     }
 
-    %% --- Pacote: barbershop.model.interfaces ---
     class Agendavel {
         <<interface>>
-        +verificarDisponibilidade(LocalDateTime dataHora) boolean
-        +agendar(LocalDateTime dataHora) void
+        +verificarDisponibilidade(dataHora)
+        +agendar(dataHora)
     }
 
     class Fidelizavel {
         <<interface>>
-        +adicionarPontos(int pontos) void
-        +resgatarPremios() void
-        +getPontosFidelidade() int
+        +adicionarPontos(pontos)
+        +resgatarPremios()
+        +getPontosFidelidade()
     }
 
-    %% --- Pacote: barbershop.model ---
     class Cliente {
-        -int pontosFidelidade
-        +Cliente(String nome, String cpf, String telefone)
-        +getPontosFidelidade() int
-        +adicionarPontos(int pontos) void
-        +resgatarPremios() void
-        +exibirDados() void
+        -pontosFidelidade
+        +Cliente(nome, cpf, telefone)
+        +getPontosFidelidade()
+        +adicionarPontos(pontos)
+        +resgatarPremios()
+        +exibirDados()
     }
 
     class Barbeiro {
-        -String especialidade
-        -double comissao
-        +Barbeiro(String nome, String cpf, String telefone, String esp, double comissao)
-        +exibirDados() void
-        +getEspecialidade() String
-        +setEspecialidade(String) void
-        +getComissao() double
-        +setComissao(double) void
+        -especialidade
+        -comissao
+        +Barbeiro(nome, cpf, telefone, esp, comissao)
+        +exibirDados()
+        +getEspecialidade()
+        +setEspecialidade()
+        +getComissao()
+        +setComissao()
     }
 
     class Servico {
-        -int tempoEstimado
-        +Servico(String nome, double valorBase, int tempoEstimado)
-        +verificarDisponibilidade(LocalDateTime dataHora) boolean
-        +agendar(LocalDateTime dataHora) void
-        +getPreco() double
-        +getTempoEstimado() int
-        +setTempoEstimado(int) void
+        -tempoEstimado
+        +Servico(nome, valorBase, tempoEstimado)
+        +verificarDisponibilidade(dataHora)
+        +agendar(dataHora)
+        +getPreco()
+        +getTempoEstimado()
+        +setTempoEstimado()
     }
 
     class Produto {
-        -int qtdEstoque
-        -String marca
-        +Produto(String nome, double valorBase, int qtdEstoque, String marca)
-        +getPreco() double
-        +getQtdEstoque() int
-        +setQtdEstoque(int) void
-        +getMarca() String
+        -qtdEstoque
+        -marca
+        -categoria
+        +Produto(nome, valorBase, qtdEstoque, marca, categoria)
+        +getPreco()
+        +getQtdEstoque()
+        +setQtdEstoque()
+        +getMarca()
+        +getCategoria()
     }
 
     class Insumo {
-        -String nome
-        -int qtdEstoque
-        -double custoUnitario
-        +Insumo(String nome, int qtdEstoque, double custo)
-        +consumir(int quantidade) void
-        +reporEstoque(int quantidade) void
-        +getNome() String
-        +getQtdEstoque() int
-        +getCustoUnitario() double
+        -nome
+        -qtdEstoque
+        -custoUnitario
+        +Insumo(nome, qtdEstoque, custo)
+        +consumir(quantidade)
+        +reporEstoque(quantidade)
+        +getNome()
+        +getQtdEstoque()
+        +getCustoUnitario()
     }
 
     class Promocao {
-        -String nome
-        -double descontoPercentual
-        -LocalDate dataInicio
-        -LocalDate dataFim
-        +Promocao(String nome, double desconto, LocalDate inicio, LocalDate fim)
-        +estaAtiva() boolean
-        +getNome() String
-        +getDescontoPercentual() double
-        +setDescontoPercentual(double) void
+        -nome
+        -descontoPercentual
+        -dataInicio
+        -dataFim
+        +Promocao(nome, desconto, inicio, fim)
+        +estaAtiva()
+        +getNome()
+        +getDescontoPercentual()
+        +setDescontoPercentual()
     }
     
     class Categoria {
-        -String nome
-        -String descricao
-        +Categoria(String nome, String descricao)
-        +getNome() String
-        +setNome(String) void
-        +getDescricao() String
-        +setDescricao(String) void
-        +toString() String
+        -nome
+        -descricao
+        +Categoria(nome, descricao)
+        +getNome()
+        +setNome()
+        +getDescricao()
+        +setDescricao()
+        +toString()
     }
 
     class Agendamento {
-        -Cliente cliente
-        -Barbeiro barbeiro
-        -Servico servico
-        -LocalDateTime dataHora
-        -StatusAgendamento status
-        +Agendamento(Cliente c, Barbeiro b, Servico s, LocalDateTime data)
-        +getStatus() StatusAgendamento
-        +setStatus(StatusAgendamento) void
-        +getDataHora() LocalDateTime
-        +setDataHora(LocalDateTime) void
+        -cliente
+        -barbeiro
+        -servico
+        -dataHora
+        -status
+        +Agendamento(cliente, barbeiro, servico, data)
+        +getStatus()
+        +setStatus()
+        +getDataHora()
+        +setDataHora()
     }
 
     class Comanda {
-        -Cliente cliente
-        -List~ItemComercializavel~ itens
-        -StatusPagamento statusPagamento
-        +Comanda(Cliente cliente)
-        +adicionarItem(ItemComercializavel item) void
-        +removerItem(ItemComercializavel item) void
-        +calcularValorTotal() double
-        +calcularValorComDesconto(Promocao promocao) double
-        +setStatusPagamento(StatusPagamento) void
+        -cliente
+        -itens
+        -statusPagamento
+        +Comanda(cliente)
+        +adicionarItem(item)
+        +removerItem(item)
+        +calcularValorTotal()
+        +calcularValorComDesconto(promocao)
+        +setStatusPagamento()
     }
 
     class StatusAgendamento {
@@ -153,149 +154,134 @@ classDiagram
         PAGO
     }
 
-    %% --- Pacote: barbershop.service ---
     class GerenciadorArquivos {
-        -String DIRETORIO_DADOS
-        -String ARQUIVO_CLIENTES
-        -String ARQUIVO_BARBEIROS
-        -String ARQUIVO_SERVICOS
-        -String ARQUIVO_PRODUTOS
-        -String ARQUIVO_INSUMOS
-        -String ARQUIVO_PROMOCOES
-        -String ARQUIVO_AGENDAMENTOS
-        -String ARQUIVO_CATEGORIAS
+        -DIRETORIO_DADOS
+        -ARQUIVO_CLIENTES
+        -ARQUIVO_BARBEIROS
+        -ARQUIVO_SERVICOS
+        -ARQUIVO_PRODUTOS
+        -ARQUIVO_INSUMOS
+        -ARQUIVO_PROMOCOES
+        -ARQUIVO_AGENDAMENTOS
+        -ARQUIVO_CATEGORIAS
         +GerenciadorArquivos()
-        +verificarDiretorio() void
-        +salvarCliente(Cliente) void
-        +carregarClientes() List~Cliente~
-        +salvarBarbeiro(Barbeiro) void
-        +carregarBarbeiros() List~Barbeiro~
-        +salvarServico(Servico) void
-        +carregaServicos() List~Servico~
-        +salvarProdutos(Produto) void
-        +carregaProdutos() List~Produto~
-        +salvarAgendamento(Agendamento) void
-        +carregarAgendamentos(...) List~Agendamento~
-        +reescreverClientes(List) void
-        +reescreverBarbeiros(List) void
-        +reescreverAgendamentos(List) void
-        +reescreverProdutos(List) void
-        %% (Outros métodos de reescrita omitidos para brevidade)
+        +verificarDiretorio()
+        +salvarCliente()
+        +carregarClientes()
+        +salvarBarbeiro()
+        +carregarBarbeiros()
+        +salvarServico()
+        +carregaServicos()
+        +salvarProdutos()
+        +carregaProdutos()
+        +salvarAgendamento()
+        +carregarAgendamentos()
+        +reescreverClientes()
+        +reescreverBarbeiros()
+        +reescreverAgendamentos()
+        +reescreverProdutos()
     }
 
     class GerenciadorDeDados {
-        -GerenciadorArquivos gerenciadorArquivos
-        -List~Cliente~ clientes
-        -List~Barbeiro~ barbeiros
-        -List~Servico~ servicos
-        -List~Produto~ produtos
-        -List~Insumo~ insumos
-        -List~Promocao~ promocoes
-        -List~Agendamento~ agendamentos
-        -List~Categoria~ categorias
+        -gerenciadorArquivos
+        -clientes
+        -barbeiros
+        -servicos
+        -produtos
+        -insumos
+        -promocoes
+        -agendamentos
+        -categorias
         +GerenciadorDeDados()
-        -carregarDadosIniciais() void
-        +cadastrarCliente(Cliente) void
-        +buscarClientePorCpf(String) Cliente
-        +cadastrarBarbeiro(Barbeiro) void
-        +buscarBarbeiroPorCpf(String) Barbeiro
-        +agendar(Agendamento) void
-        +verificarDisponibilidade(Barbeiro, LocalDateTime, int) void
-        +removerCliente(String) boolean
-        +removerBarbeiro(String) boolean
-        +removerAgendamento(Agendamento) void
-        +atualizarEstoqueProdutos() void
-        +atualizarPontosClientes() void
-        %% (Outros métodos CRUD omitidos para brevidade)
+        +cadastrarCliente()
+        +buscarClientePorCpf()
+        +cadastrarBarbeiro()
+        +buscarBarbeiroPorCpf()
+        +agendar()
+        +verificarDisponibilidade()
+        +removerCliente()
+        +removerBarbeiro()
+        +removerAgendamento()
+        +atualizarEstoqueProdutos()
+        +atualizarPontosClientes()
     }
 
     class GerenciadorPreferencias {
-        -String ARQUIVO_CONFIG
-        -Properties props
+        -ARQUIVO_CONFIG
+        -props
         +GerenciadorPreferencias()
-        -carregarPreferencias() void
-        +salvarPreferencias() void
-        +getNomeUsuario() String
-        +setNomeUsuario(String) void
-        +getTema() String
-        +setTema(String) void
+        +salvarPreferencias()
+        +getNomeUsuario()
+        +setNomeUsuario()
+        +getTema()
+        +setTema()
     }
 
-    %% --- Pacote: barbershop.exception ---
     class CPFInvalidoException {
-        +CPFInvalidoException(String message)
+        +CPFInvalidoException(message)
     }
+
     class EstoqueInsuficienteException {
-        +EstoqueInsuficienteException(String message)
+        +EstoqueInsuficienteException(message)
     }
+
     class HorarioIndisponivelException {
-        +HorarioIndisponivelException(String message)
+        +HorarioIndisponivelException(message)
     }
+
     class PontosInsuficientesException {
-        +PontosInsuficientesException(String message)
-    }
-    class Exception {
-        <<Java Built-in>>
-    }
-    class RuntimeException {
-        <<Java Built-in>>
+        +PontosInsuficientesException(message)
     }
 
-    %% --- Main ---
     class Main {
-        -GerenciadorDeDados gerenciador
-        -Scanner scanner
-        -GerenciadorPreferencias prefs
-        +main(String[] args) void
-        -exibirMenuPrincipal() void
-        -menuCadastros() void
-        -menuAgendamentos() void
-        -menuComanda() void
-        -menuRelatorios() void
-        -menuManutencao() void
-        -menuConfiguracoes() void
+        -gerenciador
+        -scanner
+        -prefs
+        +main(args)
+        -exibirMenuPrincipal()
+        -menuCadastros()
+        -menuAgendamentos()
+        -menuComanda()
+        -menuRelatorios()
+        -menuManutencao()
+        -menuConfiguracoes()
     }
 
-    %% --- Relações de Herança e Implementação ---
+    %% Heranças
     Cliente --|> Pessoa
     Barbeiro --|> Pessoa
     Cliente ..|> Fidelizavel
-    
     Servico --|> ItemComercializavel
     Produto --|> ItemComercializavel
     Servico ..|> Agendavel
 
-    %% --- Relações de Associação e Dependência ---
+    %% Associações
+    Produto --> Categoria
     Agendamento --> Cliente
     Agendamento --> Barbeiro
     Agendamento --> Servico
     Agendamento --> StatusAgendamento
 
     Comanda --> Cliente
-    Comanda --> ItemComercializavel : contem lista de
+    Comanda --> ItemComercializavel
     Comanda --> StatusPagamento
-    Comanda ..> Promocao : usa
+    Comanda ..> Promocao
 
-    GerenciadorDeDados --> GerenciadorArquivos : usa
-    GerenciadorDeDados o-- Cliente : gere lista
-    GerenciadorDeDados o-- Barbeiro : gere lista
-    GerenciadorDeDados o-- Servico : gere lista
-    GerenciadorDeDados o-- Produto : gere lista
-    GerenciadorDeDados o-- Insumo : gere lista
-    GerenciadorDeDados o-- Promocao : gere lista
-    GerenciadorDeDados o-- Agendamento : gere lista
-    GerenciadorDeDados o-- Categoria : gere lista
+    GerenciadorDeDados --> GerenciadorArquivos
+    GerenciadorDeDados --> Cliente
+    GerenciadorDeDados --> Barbeiro
+    GerenciadorDeDados --> Servico
+    GerenciadorDeDados --> Produto
+    GerenciadorDeDados --> Insumo
+    GerenciadorDeDados --> Promocao
+    GerenciadorDeDados --> Agendamento
+    GerenciadorDeDados --> Categoria
 
     Main --> GerenciadorDeDados
     Main --> GerenciadorPreferencias
 
-    %% --- Relações de Exceção ---
     CPFInvalidoException --|> Exception
     EstoqueInsuficienteException --|> Exception
     HorarioIndisponivelException --|> Exception
     PontosInsuficientesException --|> RuntimeException
-
-    Insumo ..> EstoqueInsuficienteException : lança
-    Cliente ..> PontosInsuficientesException : lança
-    Main ..> CPFInvalidoException : trata
-    GerenciadorDeDados ..> HorarioIndisponivelException : lança
+```
